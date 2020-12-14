@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ObjectOrientedMetricCalculator
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
-            Console.WriteLine("he here");
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new AnalyzerForm());
         }
     }
 }

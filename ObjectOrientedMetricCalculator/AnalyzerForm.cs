@@ -37,7 +37,13 @@ namespace ObjectOrientedMetricCalculator
                         {
                             allLinesInAllFiles.AddRange(File.ReadAllLines(filename).ToList());
                         }
-                        //List<string> methodNames = new List<string>();
+
+                        Analyzer analyzer = new Analyzer();
+                        var depthOfInheritanceTree = analyzer.GetDepthOfInheritanceTree(string.Join("\n", allLinesInAllFiles));
+                        foreach (var item in depthOfInheritanceTree)
+                        {
+                            Console.WriteLine(item.Item1 + "\t" + item.Item2);
+                        }
                     }
                 }
             }

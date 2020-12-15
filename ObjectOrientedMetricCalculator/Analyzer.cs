@@ -17,45 +17,42 @@ namespace ObjectOrientedMetricCalculator
             
             List<string> inheritedClasses = GetInheritedClasses(moduleListing);
             List<Tuple<string, string>> parentChildrenList = GetParentChildrenList(inheritedClasses);
-            parentChildrenList = (List<Tuple<string, string>>)parentChildrenList.OrderBy(tuple => tuple.Item1).ThenBy(tuple => tuple.Item2);
-            foreach(var parentChildren in parentChildrenList)
+            foreach(var parentChildren in parentChildrenList) //maybe in all classes list
             {
-                int counter = 0;
-                //List<Tuple<string, string>> tree = new List<Tuple<string, string>>();
                 string parent = parentChildren.Item1;
+                string children = parentChildren.Item2;
+                result.Add(new Tuple<string, int>(parent, GetDepthRecursive(parentChildrenList, children)));
             }
-
 
             return result;
         }
 
-        /*public int GetDepthRecursive(List<Tuple<string, string>> parentChildrenList, string node)
+        public int GetDepthRecursive(List<Tuple<string, string>> parentChildrenList, string node) //node - children
         {
-            if ()
+            var childList = ChildList(node, parentChildrenList);
+            if (childList.Count() == 0)
             {
-
-            }
-
-            /*if (number == 0)
                 return 1;
-
-            double factorial = 1;
-            for (int i = number; i >= 1; i--)
-            {
-                factorial = factorial * i;
             }
-            return factorial;
-            return 1;
+
+            int maxDepth = 0;
+
+            foreach(var child in childList)
+            {
+                int depth = GetDepthRecursive(parentChildrenList, child.Item2) + 1;
+                if (maxDepth < depth)
+                {
+                    maxDepth = depth;
+                }
+            }
+
+            return maxDepth;
         }
 
-        private bool FindParent(List<Tuple<string, string>> parentChildrenList, string node)
+        private IEnumerable<Tuple<string, string>> ChildList(string node, List<Tuple<string, string>> parentChildrenList)
         {
-            foreach (var lst in tr)
-            {
-                if (lst.Item1.Equals("Test"))
-                    MessageBox.Show("Value Avail");
-            }
-        }*/
+            return parentChildrenList.Where(i => i.Item1 == node);
+        }
 
         private List<string> GetInheritedClasses(string moduleListing)
         {
@@ -82,15 +79,15 @@ namespace ObjectOrientedMetricCalculator
             List<Tuple<string, string>> result = new List<Tuple<string, string>>();
             foreach (string inhClass in inheritedClasses)
             {
-                var splitted = inhClass.Split(':');
+                var splitted = inhClass.Substring(6).Split(':'); //"class "
 
                 if (splitted.Length != 2)
                 {
                     continue;
                 }
 
-                string parent = splitted.Last();
-                string children = splitted.First();
+                string parent = splitted.Last().Trim();
+                string children = splitted.First().Trim();
                 result.Add(new Tuple<string, string>(parent, children));
             }
 

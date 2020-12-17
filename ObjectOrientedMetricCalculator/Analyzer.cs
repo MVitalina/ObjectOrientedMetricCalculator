@@ -7,57 +7,81 @@ using System.Threading.Tasks;
 
 namespace ObjectOrientedMetricCalculator
 {
-    class Analyzer
+    partial class Analyzer
     {
-        public List<Tuple<string, int>> GetDepthOfInheritanceTree(string moduleListing)
+        public Analyzer(string moduleListing)
         {
-            List<Tuple<string, int>> result = new List<Tuple<string, int>>();
+            AllClasses = ParseAllClasses(moduleListing);
+            ParentChildrenList = ParseInheritedClasses(moduleListing);
+        }
 
-            //TODO classes without inheritance: return 1;
-            
-            List<string> inheritedClasses = GetInheritedClasses(moduleListing);
-            List<Tuple<string, string>> parentChildrenList = GetParentChildrenList(inheritedClasses);
-            foreach(var parentChildren in parentChildrenList) //maybe in all classes list
+        readonly List<Tuple<string, string>> ParentChildrenList = new List<Tuple<string, string>>();
+        readonly List<string> AllClasses = new List<string>();
+
+        private IEnumerable<Tuple<string, string>> ChildList(string node)
+        {
+            return ParentChildrenList.Where(i => i.Item1 == node);
+        }
+
+        private List<string> ParseAllClasses(string moduleListing)
+        {
+            List<string> allClasses = GetAllMatches(moduleListing, "class\\s*[a-zA-Z]*\\s*[:{]");
+            List<string> result = new List<string>();
+
+            foreach (string inhClass in allClasses)
             {
-                string parent = parentChildren.Item1;
-                string children = parentChildren.Item2;
-                result.Add(new Tuple<string, int>(parent, GetDepthRecursive(parentChildrenList, children)));
+                if (inhClass.Length < 8)
+                {
+                    continue;
+                }
+
+                string className = inhClass.Substring(6); //getting rid of "class " 
+                className = className.Remove(className.Length - 2); //getting rid of last char '{' or ':'
+                className = className.Trim();
+
+                if (!result.Contains(className))
+                {
+                    result.Add(className);
+                }
             }
 
             return result;
         }
 
-        public int GetDepthRecursive(List<Tuple<string, string>> parentChildrenList, string node) //node - children
+        private List<Tuple<string, string>> ParseInheritedClasses(string moduleListing)
         {
-            var childList = ChildList(node, parentChildrenList);
-            if (childList.Count() == 0)
-            {
-                return 1;
-            }
+            List<string> inheritedClasses = GetAllMatches(moduleListing, "class\\s*[a-zA-Z]*\\s*:\\s*[a-zA-Z]*");
+            List<Tuple<string, string>> result = new List<Tuple<string, string>>();
 
-            int maxDepth = 0;
-
-            foreach(var child in childList)
+            foreach (string inhClass in inheritedClasses)
             {
-                int depth = GetDepthRecursive(parentChildrenList, child.Item2) + 1;
-                if (maxDepth < depth)
+                if (inhClass.Length < 7)
                 {
-                    maxDepth = depth;
+                    continue;
+                }
+
+                var splitted = inhClass.Substring(6).Split(':'); //getting rid of "class " by substring
+
+                if (splitted.Length != 2)
+                {
+                    continue;
+                }
+
+                string parent = splitted.Last().Trim();
+                string children = splitted.First().Trim();
+
+                if (AllClasses.Contains(parent))
+                {
+                    result.Add(new Tuple<string, string>(parent, children));
                 }
             }
 
-            return maxDepth;
+            return result;
         }
 
-        private IEnumerable<Tuple<string, string>> ChildList(string node, List<Tuple<string, string>> parentChildrenList)
+        private List<string> GetAllMatches(string moduleListing, string pattern)
         {
-            return parentChildrenList.Where(i => i.Item1 == node);
-        }
-
-        private List<string> GetInheritedClasses(string moduleListing)
-        {
-            string pattern_inheritedClass = "class\\s*[a-zA-Z]*\\s*:\\s*[a-zA-Z]*";
-            Regex rgx = new Regex(pattern_inheritedClass);
+            Regex rgx = new Regex(pattern);
 
             List<string> result = new List<string>();
 
@@ -69,26 +93,6 @@ namespace ObjectOrientedMetricCalculator
                 {
                     result.Add(m.Value);
                 }
-            }
-
-            return result;
-        }
-
-        private List<Tuple<string, string>> GetParentChildrenList(List<string> inheritedClasses)
-        {
-            List<Tuple<string, string>> result = new List<Tuple<string, string>>();
-            foreach (string inhClass in inheritedClasses)
-            {
-                var splitted = inhClass.Substring(6).Split(':'); //"class "
-
-                if (splitted.Length != 2)
-                {
-                    continue;
-                }
-
-                string parent = splitted.Last().Trim();
-                string children = splitted.First().Trim();
-                result.Add(new Tuple<string, string>(parent, children));
             }
 
             return result;

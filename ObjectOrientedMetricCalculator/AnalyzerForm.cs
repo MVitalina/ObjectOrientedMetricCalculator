@@ -58,6 +58,11 @@ namespace ObjectOrientedMetricCalculator
             buttonChild.Enabled = true;
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ReadFile();
+        }
+
         private void buttonDepth_Click(object sender, EventArgs e)
         {
             if (analyzer == null)
@@ -92,9 +97,44 @@ namespace ObjectOrientedMetricCalculator
             richTextBoxResult.Text = result;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void buttonMHF_Click(object sender, EventArgs e)
         {
-            ReadFile();
+            double mhf = Analyzer.GetМethodHidingFactor();
+            string result = "MHF = " + mhf.ToString();
+
+            richTextBoxResult.Text = result;
+        }
+
+        private void buttonAHF_Click(object sender, EventArgs e)
+        {
+            double mhf = Analyzer.GetAttributeHidingFactor();
+            string result = "AHF = " + mhf.ToString();
+
+            richTextBoxResult.Text = result;
+        }
+
+        private void buttonMIF_Click(object sender, EventArgs e)
+        {
+            double mif = Analyzer.GetMethodInheritanceFactor();
+            string result = "MIF = " + mif.ToString();
+
+            richTextBoxResult.Text = result;
+        }
+
+        private void buttonAIF_Click(object sender, EventArgs e)
+        {
+            double aif = Analyzer.GetAttributeInheritanceFactor();
+            string result = "AIF = " + aif.ToString();
+
+            richTextBoxResult.Text = result;
+        }
+
+        private void buttonPOF_Click(object sender, EventArgs e)
+        {
+            double pof = Analyzer.GetPolymorphismObjectFactor();
+            string result = "POF = " + pof.ToString();
+
+            richTextBoxResult.Text = result;
         }
     }
 }

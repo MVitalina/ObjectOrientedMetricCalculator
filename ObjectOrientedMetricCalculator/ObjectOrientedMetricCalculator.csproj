@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyzer.cs" />
+    <Compile Include="Analyzer.MOOD.cs" />
     <Compile Include="Analyzer.DepthOfInheritanceTree.cs" />
     <Compile Include="Analyzer.NumberOfChild.cs" />
     <Compile Include="AnalyzerForm.cs">
